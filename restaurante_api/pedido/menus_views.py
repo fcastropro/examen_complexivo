@@ -20,12 +20,24 @@ def oid_or_none(id_str: str):
     except InvalidId:
         return None
 
+def _build_menus_query(request):
+    q = {}
+    allowed = ("name", "category", "is_available")
+    for key in allowed:
+        val = request.query_params.get(key)
+        if val is not None and val != "":
+            if key == "is_available":
+                q[key] = val.lower() in ("true", "1", "yes")
+            else:
+                q[key] = val
+    return q
+
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def menus_list_create(request):
     if request.method == "GET":
-        q = dict(request.query_params)
-        docs = [fix_id(d) for d in col.find(q)]
+        q = _build_menus_query(request)
+        docs = [fix_id(d.copy()) for d in col.find(q)]
         return Response(docs)
 
     serializer = MenuSerializer(data=request.data)

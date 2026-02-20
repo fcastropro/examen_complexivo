@@ -8,10 +8,16 @@ class ServiceTypeSerializer(serializers.Serializer):
 
 class RestaurantServiceSerializer(serializers.Serializer):
     table_id = serializers.IntegerField()
-    service_type_id = serializers.CharField()
+    menu_id = serializers.CharField(required=False)
+    service_type_id = serializers.CharField(required=False)
     date = serializers.DateField(required=False)
     cost = serializers.FloatField(required=False)
     notes = serializers.CharField(required=False, allow_blank=True)
+
+    def validate(self, attrs):
+        if not attrs.get("menu_id") and not attrs.get("service_type_id"):
+            raise serializers.ValidationError("menu_id o service_type_id requerido")
+        return attrs
 
 class MenuSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=200)

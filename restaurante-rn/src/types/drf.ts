@@ -5,7 +5,9 @@ export type Paginated<T> = {
   results: T[];
 };
 
-export function toArray<T>(data: Paginated<T> | T[]): T[] {
-  // Soporta backend que responde paginado (DRF) o directo (array)
-  return Array.isArray(data) ? data : data.results;
+export function toArray<T>(data: Paginated<T> | T[] | null | undefined): T[] {
+  if (data == null) return [];
+  if (Array.isArray(data)) return data;
+  if (typeof data === "object" && Array.isArray((data as Paginated<T>).results)) return (data as Paginated<T>).results;
+  return [];
 }

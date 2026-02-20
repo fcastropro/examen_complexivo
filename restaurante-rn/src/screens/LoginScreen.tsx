@@ -35,7 +35,7 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login (JWT)</Text>
+      <Text style={styles.title}>Login Pedidos</Text>
       {!!errorMessage && <Text style={styles.error}>{errorMessage}</Text>}
 
       <Text style={styles.label}>Usuario</Text>

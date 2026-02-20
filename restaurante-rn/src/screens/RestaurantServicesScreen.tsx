@@ -3,16 +3,16 @@ import { View, Text, TextInput, Pressable, FlatList, StyleSheet } from "react-na
 import { Picker } from "@react-native-picker/picker";
 
 import { listTablesApi } from "../api/tables.api";
-import { listServiceTypesApi } from "../api/serviceTypes.api";
+import { listMenusApi } from "../api/menus.api";
 import { listRestaurantServicesApi, createRestaurantServiceApi, deleteRestaurantServiceApi } from "../api/restaurantServices.api";
 
 import type { Table } from "../types/table";
-import type { ServiceType } from "../types/serviceType";
+import type { Menu } from "../types/menu";
 import type { RestaurantService } from "../types/restaurantService";
 import { toArray } from "../types/drf";
 
-function serviceTypeLabel(st: ServiceType): string {
-  return st.name;
+function menuLabel(m: Menu): string {
+  return `${m.name} ($${m.price})`;
 }
 
 function parseOptionalNumber(input: string): { value?: number; error?: string } {
@@ -26,14 +26,15 @@ function parseOptionalNumber(input: string): { value?: number; error?: string } 
 export default function RestaurantServicesScreen() {
   const [services, setServices] = useState<RestaurantService[]>([]);
   const [tables, setTables] = useState<Table[]>([]);
-  const [serviceTypes, setServiceTypes] = useState<ServiceType[]>([]);
+  const [menus, setMenus] = useState<Menu[]>([]);
 
   const [selectedTableId, setSelectedTableId] = useState<number | null>(null);
-  const [selectedServiceTypeId, setSelectedServiceTypeId] = useState<string>("");
+  const [selectedMenuId, setSelectedMenuId] = useState<string>("");
 
   const [notes, setNotes] = useState("");
   const [costInput, setCostInput] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [menusError, setMenusError] = useState("");
 
   const tableById = useMemo(() => {
     const map = new Map<number, Table>();
@@ -41,32 +42,37 @@ export default function RestaurantServicesScreen() {
     return map;
   }, [tables]);
 
-  const serviceTypeById = useMemo(() => {
-    const map = new Map<string, ServiceType>();
-    serviceTypes.forEach((s) => map.set(s.id, s));
+  const menuById = useMemo(() => {
+    const map = new Map<string, Menu>();
+    menus.forEach((m) => map.set(m.id, m));
     return map;
-  }, [serviceTypes]);
+  }, [menus]);
 
   const loadAll = async (): Promise<void> => {
+    setErrorMessage("");
+    setMenusError("");
     try {
-      setErrorMessage("");
-
-      const [servicesData, tablesData, serviceTypesData] = await Promise.all([
+      const [servicesData, tablesData] = await Promise.all([
         listRestaurantServicesApi(),
         listTablesApi(),
-        listServiceTypesApi(),
       ]);
-
       const servicesList = toArray(servicesData);
       const tablesList = toArray(tablesData);
-      const serviceTypesList = toArray(serviceTypesData);
-
       setServices(servicesList);
       setTables(tablesList);
-      setServiceTypes(serviceTypesList);
-
       if (selectedTableId === null && tablesList.length) setSelectedTableId(tablesList[0].id);
-      if (!selectedServiceTypeId && serviceTypesList.length) setSelectedServiceTypeId(serviceTypesList[0].id);
+
+      try {
+        const menusData = await listMenusApi();
+        const menusList = toArray(menusData).filter((m) => m && m.id && m.is_available !== false);
+        setMenus(menusList);
+        if (menusList.length && !selectedMenuId) setSelectedMenuId(menusList[0].id);
+        if (menusList.length === 0 && !toArray(menusData).length)
+          setMenusError("Backend devolvió 0 ítems. Revise: 1) .env del backend con MONGO_DB=restaurant_logs  2) Estar logueado en la app  3) GET /api/menus/ con token en Postman");
+      } catch {
+        setMenusError("Menú no cargó. ¿Logueado? ¿Backend en marcha? Emulador: 10.0.2.2:8000. Dispositivo real: IP del PC (ej. 192.168.1.x:8000) en src/config.ts");
+        setMenus([]);
+      }
     } catch {
       setErrorMessage("No se pudo cargar info.");
     }
@@ -79,7 +85,7 @@ export default function RestaurantServicesScreen() {
       setErrorMessage("");
 
       if (selectedTableId === null) return setErrorMessage("Seleccione una mesa");
-      if (!selectedServiceTypeId) return setErrorMessage("Seleccione un tipo de servicio");
+      if (!selectedMenuId) return setErrorMessage("Seleccione un ítem del menú");
 
       const trimmedNotes = notes.trim() ? notes.trim() : undefined;
       const { value: parsedCost, error } = parseOptionalNumber(costInput);
@@ -87,7 +93,7 @@ export default function RestaurantServicesScreen() {
 
       const created = await createRestaurantServiceApi({
         table_id: selectedTableId,
-        service_type_id: selectedServiceTypeId,
+        menu_id: selectedMenuId,
         notes: trimmedNotes,
         cost: parsedCost,
       });
@@ -114,6 +120,7 @@ export default function RestaurantServicesScreen() {
     <View style={styles.container}>
       <Text style={styles.title}>Servicios restaurante</Text>
       {!!errorMessage && <Text style={styles.error}>{errorMessage}</Text>}
+      {!!menusError && <Text style={styles.error}>{menusError}</Text>}
 
       <Text style={styles.label}>Mesa</Text>
       <View style={styles.pickerWrap}>
@@ -129,16 +136,17 @@ export default function RestaurantServicesScreen() {
         </Picker>
       </View>
 
-      <Text style={styles.label}>Tipo de servicio</Text>
+      <Text style={styles.label}>Ítem del menú</Text>
       <View style={styles.pickerWrap}>
         <Picker
-          selectedValue={selectedServiceTypeId}
-          onValueChange={(value) => setSelectedServiceTypeId(String(value))}
+          selectedValue={selectedMenuId || ""}
+          onValueChange={(value) => setSelectedMenuId(String(value))}
           dropdownIconColor="#58a6ff"
           style={styles.picker}
         >
-          {serviceTypes.map((st) => (
-            <Picker.Item key={st.id} label={serviceTypeLabel(st)} value={st.id} />
+          <Picker.Item label={menus.length === 0 ? "No hay ítems (refresque)" : "Seleccione..."} value="" />
+          {menus.map((m) => (
+            <Picker.Item key={m.id} label={menuLabel(m)} value={m.id} />
           ))}
         </Picker>
       </View>
@@ -175,10 +183,10 @@ export default function RestaurantServicesScreen() {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => {
           const t = tableById.get(item.table_id);
-          const st = serviceTypeById.get(item.service_type_id);
+          const menu = (item.menu_id && menuById.get(item.menu_id)) || (item.service_type_id && menuById.get(item.service_type_id));
 
           const line1 = t ? t.name : `table_id: ${item.table_id}`;
-          const line2 = st ? st.name : `service_type_id: ${item.service_type_id}`;
+          const line2 = menu ? menu.name : (item.menu_id || item.service_type_id || "-");
 
           const extras: string[] = [];
           if (item.cost !== undefined) extras.push(`Costo: ${item.cost}`);

@@ -4,7 +4,8 @@ import type { Paginated } from "../types/drf";
 
 export type RestaurantServiceCreatePayload = {
   table_id: number;
-  service_type_id: string;
+  menu_id?: string;
+  service_type_id?: string;
   notes?: string;
   cost?: number;
 };
