@@ -7,10 +7,10 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-import { type Table, listTablesApi, createTableApi, updateTableApi, deleteTableApi } from "../api/tables.api";
+import { type Table as Mesa, listTablesApi, createTableApi, updateTableApi, deleteTableApi } from "../api/tables.api";
 
 export default function AdminMesasPage() {
-  const [items, setItems] = useState<Table[]>([]);
+  const [items, setItems] = useState<Mesa[]>([]);
   const [name, setName] = useState("");
   const [capacity, setCapacity] = useState(4);
   const [is_available, setIsAvailable] = useState(true);
@@ -48,7 +48,7 @@ export default function AdminMesasPage() {
     }
   };
 
-  const startEdit = (t: Table) => {
+  const startEdit = (t: Mesa) => {
     setEditId(t.id);
     setName(t.name);
     setCapacity(t.capacity);

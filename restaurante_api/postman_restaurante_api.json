@@ -1,0 +1,344 @@
+{
+  "info": {
+    "name": "Restaurante API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "restaurante"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://127.0.0.1:8000" },
+    { "key": "accessToken", "value": "" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"tu_usuario\",\n  \"password\": \"tu_password\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/login/"
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh\": \"{{refreshToken}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/refresh/"
+          }
+        },
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"nuevo\",\n  \"email\": \"nuevo@ejemplo.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/register/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tables (Mesas)",
+      "item": [
+        {
+          "name": "List mesas",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/tables/"
+          }
+        },
+        {
+          "name": "Create mesa",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Mesa 1\",\n  \"capacity\": 4,\n  \"is_available\": true\n}"
+            },
+            "url": "{{baseUrl}}/api/tables/"
+          }
+        },
+        {
+          "name": "Get mesa",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/tables/1/"
+          }
+        },
+        {
+          "name": "Update mesa",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Mesa 1\",\n  \"capacity\": 6,\n  \"is_available\": false\n}"
+            },
+            "url": "{{baseUrl}}/api/tables/1/"
+          }
+        },
+        {
+          "name": "Delete mesa",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/tables/1/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders (Pedidos)",
+      "item": [
+        {
+          "name": "List pedidos (público)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/orders/"
+          }
+        },
+        {
+          "name": "Create pedido",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"table\": 1,\n  \"items_summary\": \"Hamburguesa x2; Cola x1\",\n  \"total\": \"15.50\",\n  \"status\": \"PENDING\"\n}"
+            },
+            "url": "{{baseUrl}}/api/orders/"
+          }
+        },
+        {
+          "name": "Get pedido",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/orders/1/"
+          }
+        },
+        {
+          "name": "Update pedido (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"IN_PROGRESS\"\n}"
+            },
+            "url": "{{baseUrl}}/api/orders/1/"
+          }
+        },
+        {
+          "name": "Delete pedido",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/orders/1/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Service Types (Mongo)",
+      "item": [
+        {
+          "name": "List service types",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/service-types/"
+          }
+        },
+        {
+          "name": "Create service type",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Desayuno\",\n  \"description\": \"Servicio mañana\",\n  \"is_active\": true\n}"
+            },
+            "url": "{{baseUrl}}/api/service-types/"
+          }
+        },
+        {
+          "name": "Get service type",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/service-types/{{objectId}}/"
+          }
+        },
+        {
+          "name": "Update service type",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Desayuno completo\"\n}" },
+            "url": "{{baseUrl}}/api/service-types/{{objectId}}/"
+          }
+        },
+        {
+          "name": "Delete service type",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/service-types/{{objectId}}/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Restaurant Services (Mongo)",
+      "item": [
+        {
+          "name": "List restaurant services",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/restaurant-services/"
+          }
+        },
+        {
+          "name": "Create restaurant service",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"table_id\": 1,\n  \"service_type_id\": \"ObjectIdHexAqui\",\n  \"notes\": \"Extra\",\n  \"cost\": 10.5\n}"
+            },
+            "url": "{{baseUrl}}/api/restaurant-services/"
+          }
+        },
+        {
+          "name": "Get restaurant service",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/restaurant-services/{{objectId}}/"
+          }
+        },
+        {
+          "name": "Delete restaurant service",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/restaurant-services/{{objectId}}/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Menus (Mongo)",
+      "item": [
+        {
+          "name": "List menus",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/menus/"
+          }
+        },
+        {
+          "name": "Create menu",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Hamburguesa clásica\",\n  \"category\": \"Platos fuertes\",\n  \"price\": 8.50,\n  \"is_available\": true\n}"
+            },
+            "url": "{{baseUrl}}/api/menus/"
+          }
+        },
+        {
+          "name": "Get menu",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/menus/{{objectId}}/"
+          }
+        },
+        {
+          "name": "Update menu",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": { "mode": "raw", "raw": "{\n  \"price\": 9.00,\n  \"is_available\": false\n}" },
+            "url": "{{baseUrl}}/api/menus/{{objectId}}/"
+          }
+        },
+        {
+          "name": "Delete menu",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/menus/{{objectId}}/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Order Events (Mongo)",
+      "item": [
+        {
+          "name": "List order events",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/order-events/"
+          }
+        },
+        {
+          "name": "List events by order_id",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/order-events/?order_id=1"
+          }
+        },
+        {
+          "name": "Create order event",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order_id\": 1,\n  \"event_type\": \"CREATED\",\n  \"source\": \"WEB\",\n  \"note\": \"Pedido creado desde Postman\"\n}"
+            },
+            "url": "{{baseUrl}}/api/order-events/"
+          }
+        },
+        {
+          "name": "Get order event",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/order-events/{{objectId}}/"
+          }
+        },
+        {
+          "name": "Update order event",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": { "mode": "raw", "raw": "{\n  \"note\": \"Nota actualizada\"\n}" },
+            "url": "{{baseUrl}}/api/order-events/{{objectId}}/"
+          }
+        },
+        {
+          "name": "Delete order event",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/order-events/{{objectId}}/"
+          }
+        }
+      ]
+    }
+  ]
+}

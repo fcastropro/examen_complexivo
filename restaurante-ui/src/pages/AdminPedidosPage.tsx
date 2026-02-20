@@ -7,14 +7,14 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-import { type Table, listTablesApi } from "../api/tables.api";
+import { type Table as Mesa, listTablesApi } from "../api/tables.api";
 import { type Order, type OrderStatus, listOrdersAdminApi, createOrderApi, updateOrderApi, deleteOrderApi } from "../api/orders.api";
 
 const STATUS_OPTIONS: OrderStatus[] = ["PENDING", "IN_PROGRESS", "SERVED", "PAID"];
 
 export default function AdminPedidosPage() {
   const [items, setItems] = useState<Order[]>([]);
-  const [tables, setTables] = useState<Table[]>([]);
+  const [tables, setTables] = useState<Mesa[]>([]);
   const [error, setError] = useState("");
 
   const [editId, setEditId] = useState<number | null>(null);

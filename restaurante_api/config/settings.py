@@ -102,4 +102,4 @@ CORS_ALLOWED_ORIGINS = [
 
 # Mongo settings
 MONGO_URI = os.getenv("MONGO_URI", "mongodb://127.0.0.1:27017")
-MONGO_DB = os.getenv("MONGO_DB", "restaurante_db")
+MONGO_DB = os.getenv("MONGO_DB", "restaurant_logs")
